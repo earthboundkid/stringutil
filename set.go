@@ -45,10 +45,16 @@ func Zero(m Set) {
 }
 
 func EqSet(a, b Set) bool {
-	if len(a) != len(b) {
-		return false
-	}
 	for k := range a {
+		if a[k] != b[k] {
+			return false
+		}
+	}
+	if len(a) == len(b) {
+		return true
+	}
+	// handle case of only one having a false value
+	for k := range b {
 		if a[k] != b[k] {
 			return false
 		}
