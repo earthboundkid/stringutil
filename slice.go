@@ -49,6 +49,15 @@ func Unique(dst, ss Slice) Slice {
 	return UniqueVia(dst, ss, nil)
 }
 
+func SymDiff(oldss, newss Slice) (added, removed Slice) {
+	oldSet := ToSet(oldss)
+	newSet := ToSet(newss)
+	addedSet, removedSet := SymDiffSets(oldSet, newSet)
+	added = ToSlice(addedSet)
+	removed = ToSlice(removedSet)
+	return
+}
+
 func EqSlice(a, b Slice) bool {
 	if len(a) != len(b) {
 		return false

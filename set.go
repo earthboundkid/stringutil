@@ -50,14 +50,27 @@ func EqSet(a, b Set) bool {
 			return false
 		}
 	}
-	if len(a) == len(b) {
-		return true
-	}
-	// handle case of only one having a false value
+	// handle case of only one set having a false value
 	for k := range b {
 		if a[k] != b[k] {
 			return false
 		}
 	}
 	return true
+}
+
+func DiffSets(oldSet, newSet Set) (added Set) {
+	added = make(map[string]bool, len(newSet))
+	for s := range newSet {
+		if newSet[s] && !oldSet[s] {
+			added[s] = true
+		}
+	}
+	return
+}
+
+func SymDiffSets(oldSet, newSet Set) (added, removed Set) {
+	added = DiffSets(oldSet, newSet)
+	removed = DiffSets(newSet, oldSet)
+	return
 }

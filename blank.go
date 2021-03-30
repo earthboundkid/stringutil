@@ -22,8 +22,8 @@ func Last(ss ...string) string {
 	return ""
 }
 
-// HasString returns true if an equal string is in the slice.
-func HasString(s string, ss ...string) bool {
+// In returns true if an equal string is in the slice.
+func In(s string, ss []string) bool {
 	for _, s2 := range ss {
 		if s == s2 {
 			return true
@@ -34,5 +34,5 @@ func HasString(s string, ss ...string) bool {
 
 // HasBlank returns true if any string is blank.
 func HasBlank(ss ...string) bool {
-	return HasString("", ss...)
+	return In("", ss)
 }

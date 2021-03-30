@@ -69,3 +69,64 @@ func Benchmark(b *testing.B) {
 		sink = stringutil.UniqueVia(inputs[i][:0], inputs[i], m)
 	}
 }
+
+func TestEqSlice(t *testing.T) {
+	tests := map[string]struct {
+		a, b string
+		eq   bool
+	}{
+		"empty":      {"", "", true},
+		"blank":      {"-", "-", true},
+		"blankfirst": {",a", ",a", true},
+		"difflength": {"a,b", "a", false},
+		"difforder":  {"a,b", "b,a", false},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			as := split(tc.a)
+			bs := split(tc.b)
+			assert(t, stringutil.EqSlice(as, bs) == tc.eq,
+				"EqSlice(%#v, %#v) != %v", as, bs, tc.eq)
+		})
+	}
+}
+
+func split(s string) []string {
+	ss := strings.Split(s, ",")
+	if s == "" {
+		return nil
+	}
+	if s == "-" {
+		return []string{""}
+	}
+	return ss
+}
+
+func TestSymDiff(t *testing.T) {
+	tests := map[string]struct {
+		Old, New, Added, Removed string
+	}{
+		"empty":       {"", "", "", ""},
+		"none":        {"a,b,c", "a,b,c", "", ""},
+		"adding":      {"", "a", "a", ""},
+		"removing":    {"a", "", "", "a"},
+		"swap":        {"a", "b", "b", "a"},
+		"some_remain": {"a,b,c", "b,c,d", "d", "a"},
+		"doubles":     {"a,a,b,c,c", "b,b,c,d,d", "d", "a"},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			old := split(tc.Old)
+			new := split(tc.New)
+			wantadded := split(tc.Added)
+			wantremoved := split(tc.Removed)
+			gotadded, gotremoved := stringutil.SymDiff(old, new)
+			stringutil.Sort(gotadded)
+			assert(t, stringutil.EqSlice(wantadded, gotadded),
+				"%#v != %#v", wantadded, gotadded)
+			stringutil.Sort(gotremoved)
+			assert(t, stringutil.EqSlice(wantremoved, gotremoved),
+				"%#v != %#v", wantremoved, gotremoved)
+		})
+	}
+}
